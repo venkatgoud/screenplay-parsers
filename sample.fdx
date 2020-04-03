@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<FinalDraft DocumentType="Script" Template="No" Version="4">
+  <Content>
+    <Paragraph Type="Scene Heading">
+      <Text>INT. SOME PLACE - DAY</Text>
+    </Paragraph>
+    <Paragraph Type="Action">
+      <Text>A character moves across.</Text>
+    </Paragraph>
+    <Paragraph Type="Character">
+      <Text>ABE</Text>
+    </Paragraph>
+    <Paragraph Type="Dialogue">
+      <Text>What’s up</Text>
+    </Paragraph>
+  <Content>
+</FinalDraft>
