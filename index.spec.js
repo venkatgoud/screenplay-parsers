@@ -93,17 +93,18 @@ describe('parseFinalDraft tests', () => {
   expect(mockparagraphStart.mock.calls[6][0]).toBe("Character");
   expect(mockparagraphStart.mock.calls[7][0]).toBe("Parenthetical");
   expect(mockparagraphStart.mock.calls[8][0]).toBe("Dialogue");
-  expect(mockparagraphStart.mock.calls[9][0]).toBe("Action");   
-  
-  expect(mocktext.mock.calls[0][0]).toBe("INT. SOME PLACE - DAY");   
-  expect(mocktext.mock.calls[1][0]).toBe("A character moves across.");   
-  expect(mocktext.mock.calls[2][0]).toBe("ABE");   
-  expect(mocktext.mock.calls[3][0]).toBe("What’s up ");   
-  expect(mocktext.mock.calls[4][0]).toBe("Lincoln");   
-  expect(mocktext.mock.calls[4][1]).toBe("Bold");   
-  expect(mocktext.mock.calls[11][0]).toBe("");   
+  expect(mockparagraphStart.mock.calls[9][0]).toBe("Action");
+
+  expect(mocktext.mock.calls[0][0]).toBe("INT. SOME PLACE - DAY");
+  expect(mocktext.mock.calls[1][0]).toBe("A character moves across.");
+  expect(mocktext.mock.calls[2][0]).toBe("ABE");
+  expect(mocktext.mock.calls[3][0]).toBe("What’s up ");
+  expect(mocktext.mock.calls[4][0]).toBe("Lincoln");
+  expect(mocktext.mock.calls[4][1]).toBe("Bold");
+  expect(mocktext.mock.calls[11][0]).toBe("");
 });
-describe('finalDraftToFountain tests', () => {
+
+describe('finalDraftToFountain tests without blank action lines', () => {
 
   const valid = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
   <FinalDraft DocumentType="Script" Template="No" Version="4"> 
@@ -127,13 +128,65 @@ describe('finalDraftToFountain tests', () => {
       </Paragraph>
     <Paragraph Type="Action">
       <Text>BOB jumps.</Text>
-    </Paragraph>
-    <Paragraph Type="Action">
-      <Text></Text>
-    </Paragraph>
+    </Paragraph>    
     </Content>
   </FinalDraft>`;
-  
+
+  const result = `
+INT. SOME PLACE - DAY
+
+A character moves across.
+
+ABE
+(slowly)
+What’s up**Lincoln**?
+
+BOB jumps.
+`;
+
+  test('sanity', () => {
+    return finalDraftToFountain(valid)
+      .then(data => {
+        console.log(data);
+        expect(data).toBe(result);
+      })
+  });
+}
+)
+
+
+describe('finalDraftToFountain tests with blank action lines', () => {
+
+  const valid = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+  <FinalDraft DocumentType="Script" Template="No" Version="4"> 
+    <Content>
+      <Paragraph Type="Scene Heading"> 
+        <Text>INT. SOME PLACE - DAY</Text>
+      </Paragraph>
+      <Paragraph Type="Action">
+        <Text>A character moves across.</Text>
+      </Paragraph>
+      <Paragraph Type="Character">
+        <Text>ABE</Text>
+      </Paragraph>
+      <Paragraph Type="Parenthetical">
+        <Text>(slowly)</Text>
+      </Paragraph>
+      <Paragraph Type="Dialogue">
+        <Text>What’s up</Text>
+        <Text AdornmentStyle="0" Background="#FFFFFFFFFFFF" Color="#000000000000" Font="Courier Final Draft" RevisionID="0" Size="12" Style="Bold">Lincoln</Text>
+        <Text>?</Text>      
+      </Paragraph>
+      <Paragraph Type="Action">
+        <Text>BOB jumps.</Text>
+        <Text></Text>
+      </Paragraph>
+      <Paragraph Type="Action">
+        <Text>Scratches himself.</Text>
+      </Paragraph>
+    </Content>
+  </FinalDraft>`;
+
   const result = `
 INT. SOME PLACE - DAY
 
@@ -145,17 +198,16 @@ What’s up**Lincoln**?
 
 BOB jumps.
 
-
-
-
+Scratches himself.
 `;
 
-  test('sanity', () => {     
+  test('sanity', () => {
     return finalDraftToFountain(valid)
-    .then(data => {
-      console.log(data);       
-      expect(data).toBe(result);     
-    })     
-  });}
+      .then(data => {
+        console.log(data);
+        expect(data).toBe(result);
+      })
+  });
+}
 )
 

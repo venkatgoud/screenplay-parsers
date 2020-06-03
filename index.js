@@ -1,7 +1,7 @@
 // FinalDraft document structure looks like this:
 // <FinalDraft> <Content> <Paragraph> <Text> </Text> </Paragraph> </Content> </FinalDraft> 
 
-// Paragraph type attributes could be: Scene Heading, Action, Character, Dialogue, Parenthetical
+// Paragraph type attributes could be: Scene Heading, Action, Character, Dialogue, Parenthetical, Transition
 // Text Style attributes could be: Bold Italic Underline. 
 // Combination Styles are attributed with '+' such as Bold+Italic
 
@@ -36,7 +36,6 @@ export function parseFinalDraft(fdx, callbacks) {
   if (undefined === callbacks || null === callbacks) {
     throw "No callbacks passed.";
   }
-
   callbacks.documentStart();
   let paragraphs = content.children;
   for (let i = 0; i < paragraphs.length; i++) {
@@ -57,19 +56,25 @@ export function finalDraftToFountain(fdx) {
 
   let currentType = '';
 
+  function resetCurrenType() {
+    currentType = '';
+  }
+
   function handleParagraphStart(type) {
-    currentType = type;     
-    if (currentType === "Scene Heading" || currentType === "Action") {
+    currentType = type;
+    if (currentType !== "Parenthetical") {
       output = output + "\n";
     }
   }
 
-  function handleParagraphEnd(type) {    
-    output = output + "\n";
-    if (currentType === "Action") {
+  function handleParagraphEnd() {
+    // if (currentType === "Scene Heading" || currentType === "Action" || currentType === "Character" || currentType === "Transition" || currentType === "Dialogue") {
+    //   output = output + "\n";
+    // }
+    if (currentType !== "Parenthetical") {
       output = output + "\n";
-    }        
-    currentType = '';
+    }
+    resetCurrenType();
   }
 
   function splitStyles(style) {
