@@ -42,8 +42,10 @@ export function parseFinalDraft(fdx, callbacks) {
     let para = paragraphs[i];
     callbacks.paragraphStart(para.getAttribute("Type"));
     let texts = para.children;
-    for (let j = 0; j < texts.length; j++) {
-      callbacks.text(texts[j].innerHTML, texts[j].getAttribute("Style"));
+    for (let j = 0; j < texts.length; j++) {       
+      if (texts[j].tagName === "Text") {
+        callbacks.text(texts[j].innerHTML, texts[j].getAttribute("Style"));
+      }
     }
     callbacks.paragraphEnd();
   }
@@ -55,12 +57,18 @@ export function parseFinalDraft(fdx, callbacks) {
 export function finalDraftToFountain(fdx) {
 
   let currentType = '';
+  function allowedType(type) {
+    const paras = ["Scene Heading", "Action", "Character", "Transition", "Dialogue", "Parenthetical"];
+    return paras.includes(type);
+  }
 
   function resetCurrenType() {
     currentType = '';
   }
 
   function handleParagraphStart(type) {
+    if (!allowedType(type))
+      return;
     currentType = type;
     if (currentType !== "Parenthetical") {
       output = output + "\n";
@@ -71,6 +79,8 @@ export function finalDraftToFountain(fdx) {
     // if (currentType === "Scene Heading" || currentType === "Action" || currentType === "Character" || currentType === "Transition" || currentType === "Dialogue") {
     //   output = output + "\n";
     // }
+    if (!allowedType(currentType))
+      return;
     if (currentType !== "Parenthetical") {
       output = output + "\n";
     }

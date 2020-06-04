@@ -211,3 +211,67 @@ Scratches himself.
 }
 )
 
+describe('finalDraftToFountain tests with unknown paratypes', () => {
+
+  const valid = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+  <FinalDraft DocumentType="Script" Template="No" Version="4"> 
+    <Content>
+      <Paragraph Type="Scene Heading">
+      <SceneProperties Length="3" Page="1" Title="">
+      <SceneArcBeats>        
+        <CharacterArcBeat Name="HOST">
+          <Paragraph Alignment="Left" FirstIndent="0.00" Leading="Regular" LeftIndent="0.00" RightIndent="1.39" SpaceBefore="0" Spacing="1" StartsNewPage="No">
+            <Text AdornmentStyle="0" Background="#FFFFFFFFFFFF" Color="#000000000000" Font="Arial" RevisionID="0" Size="12" Style=""></Text>
+          </Paragraph>
+        </CharacterArcBeat>
+        <CharacterArcBeat Name="PREETHI">
+          <Paragraph Alignment="Left" FirstIndent="0.00" Leading="Regular" LeftIndent="0.00" RightIndent="1.39" SpaceBefore="0" Spacing="1" StartsNewPage="No">
+            <Text AdornmentStyle="0" Background="#FFFFFFFFFFFF" Color="#000000000000" Font="Arial" RevisionID="0" Size="12" Style=""></Text>
+          </Paragraph>
+        </CharacterArcBeat>                     
+      </SceneArcBeats>
+    </SceneProperties> 
+      <Text>INT. SOME PLACE - DAY</Text>
+      </Paragraph>
+      <Paragraph Type="Action">
+        <Text>A character moves across.</Text>
+      </Paragraph>
+      <Paragraph Type="Character">
+        <Text>ABE</Text>
+      </Paragraph>
+      <Paragraph Type="Parenthetical">
+        <Text>(slowly)</Text>
+      </Paragraph>
+      <Paragraph Type="Dialogue">
+        <Text>What’s up</Text>
+        <Text AdornmentStyle="0" Background="#FFFFFFFFFFFF" Color="#000000000000" Font="Courier Final Draft" RevisionID="0" Size="12" Style="Bold">Lincoln</Text>
+        <Text>?</Text>      
+      </Paragraph>
+    <Paragraph Type="Action">
+      <Text>BOB jumps.</Text>
+    </Paragraph>    
+    </Content>
+  </FinalDraft>`;
+
+  const result = `
+INT. SOME PLACE - DAY
+
+A character moves across.
+
+ABE
+(slowly)
+What’s up**Lincoln**?
+
+BOB jumps.
+`;
+
+  test('sanity', () => {
+    return finalDraftToFountain(valid)
+      .then(data => {
+        console.log(data);
+        expect(data).toBe(result);
+      })
+  });
+}
+)
+
