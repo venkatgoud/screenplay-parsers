@@ -104,7 +104,53 @@ describe('parseFinalDraft tests', () => {
   expect(mocktext.mock.calls[11][0]).toBe("");
 });
 
-describe('finalDraftToFountain tests without blank action lines', () => {
+describe('finalDraftToFountain tests', () => {
+
+  const valid = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+  <FinalDraft DocumentType="Script" Template="No" Version="4"> 
+    <Content>
+      <Paragraph Type="Scene Heading"> 
+        <Text>INT. SOME PLACE - DAY</Text>
+      </Paragraph>
+      <Paragraph Type="Action">
+        <Text>A character moves across.</Text>
+      </Paragraph>
+      <Paragraph Type="Character">
+        <Text>ABE</Text>
+      </Paragraph>       
+      <Paragraph Type="Dialogue">
+        <Text>What’s up</Text>
+        <Text AdornmentStyle="0" Background="#FFFFFFFFFFFF" Color="#000000000000" Font="Courier Final Draft" RevisionID="0" Size="12" Style="Bold">Lincoln</Text>
+        <Text>?</Text>      
+      </Paragraph>
+    <Paragraph Type="Action">
+      <Text>BOB jumps.</Text>
+    </Paragraph>    
+    </Content>
+  </FinalDraft>`;
+
+  const result = `
+INT. SOME PLACE - DAY
+
+A character moves across.
+
+ABE
+What’s up**Lincoln**?
+
+BOB jumps.
+`;
+
+  test('sanity', () => {
+    return finalDraftToFountain(valid)
+      .then(data => {
+        console.log(data);
+        expect(data).toBe(result);
+      })
+  });
+}
+)
+
+describe('finalDraftToFountain tests with parenthetical', () => {
 
   const valid = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
   <FinalDraft DocumentType="Script" Template="No" Version="4"> 

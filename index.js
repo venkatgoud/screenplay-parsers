@@ -42,7 +42,7 @@ export function parseFinalDraft(fdx, callbacks) {
     let para = paragraphs[i];
     callbacks.paragraphStart(para.getAttribute("Type"));
     let texts = para.children;
-    for (let j = 0; j < texts.length; j++) {       
+    for (let j = 0; j < texts.length; j++) {
       if (texts[j].tagName === "Text") {
         callbacks.text(texts[j].innerHTML, texts[j].getAttribute("Style"));
       }
@@ -56,35 +56,62 @@ export function parseFinalDraft(fdx, callbacks) {
 // when resolved it has the string representation in fountain format
 export function finalDraftToFountain(fdx) {
 
+  let output = '';
+  let prevType = '';
   let currentType = '';
+  let text = '';
+  let resolver;
+  let promise = new Promise(resolve => { resolver = resolve })
+
   function allowedType(type) {
     const paras = ["Scene Heading", "Action", "Character", "Transition", "Dialogue", "Parenthetical"];
     return paras.includes(type);
   }
 
-  function resetCurrenType() {
-    currentType = '';
-  }
-
   function handleParagraphStart(type) {
     if (!allowedType(type))
       return;
+    prevType = currentType;
     currentType = type;
-    if (currentType !== "Parenthetical") {
-      output = output + "\n";
-    }
   }
 
-  function handleParagraphEnd() {
-    // if (currentType === "Scene Heading" || currentType === "Action" || currentType === "Character" || currentType === "Transition" || currentType === "Dialogue") {
-    //   output = output + "\n";
-    // }
+  function handleParagraphEnd() {     
     if (!allowedType(currentType))
       return;
-    if (currentType !== "Parenthetical") {
-      output = output + "\n";
+    switch (currentType) {
+      case "Trasition":
+        output += `\n${text}\n\n`;
+        break;
+      case "Scene Heading":
+        if (prevType !== "Transition")
+          output += `\n${text}\n\n`;
+        else
+          output += `\n${text}\n\n`;
+        break;
+      case "Character":
+        if (prevType === "Transition" || prevType === "Scene Heading")
+          output += `${text.toUpperCase()}\n`;
+        else
+          output += `\n${text.toUpperCase()}\n`;
+        break;
+      case "Parenthetical":
+        output += `${text}\n`;
+        break;
+      case "Dialogue":
+        output += `${text}\n`;
+        break;
+      case "Action":         
+        if (prevType === "Dialogue" || prevType === "Parenthetical") {
+          output += `\n${text}\n`;
+        }
+        else {
+          output += `${text}\n`;
+        }
+        break;
+      default:
+        break;
     }
-    resetCurrenType();
+    text = '';
   }
 
   function splitStyles(style) {
@@ -119,17 +146,18 @@ export function finalDraftToFountain(fdx) {
     return str;
   }
 
-  let output = '';
-  let resolver;
-  let promise = new Promise(resolve => { resolver = resolve })
-
-  function handleText(str, style) {
+  function handleText(str, style) {     
     let styles = splitStyles(style);
 
     const bold = applyBold(str, styles);
     const italic = applyItalic(bold, styles);
     const underline = applyUnderline(italic, styles);
-    output = output + underline;
+    if (currentType === "Action" && str === "") {
+      text = text + "\n";
+    }
+    else {
+      text += underline;
+    }
   }
 
   let callbacks = {
